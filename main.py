@@ -29,10 +29,10 @@ except:
         except:
             print("[ERROR 1] Pygame could not be installed")
 
+    import pygame
+
 import physics
 import math
-import pygame
-import os
 import courses
 import startScreen
 from time import sleep, time
@@ -43,7 +43,7 @@ import sys
 # INITIALIZATION
 pygame.init()
 
-SOUNDS = False
+SOUND = False
 
 winwidth = 1080
 winheight = 600
@@ -90,7 +90,7 @@ shoot = False
 start = True
 
 # LOAD MUSIC
-if SOUNDS:
+if SOUND:
     wrong = pygame.mixer.Sound(os.path.join('sounds', 'wrong12.wav'))
     puttSound = pygame.mixer.Sound(os.path.join('sounds', 'putt.wav'))
     inHole = pygame.mixer.Sound(os.path.join('sounds', 'inHole.wav'))
