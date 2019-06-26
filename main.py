@@ -1,3 +1,34 @@
+import subprocess
+import sys
+import get_pip
+
+def install(package):
+    subprocess.call([sys.executable, "-m", "pip", "install", package])
+
+try:
+    print("[GAME] Trying to import pygame")
+    import pygame
+except:
+    print("[EXCEPTION] Pygame not installed")
+
+    try:
+        print("[GAME] Trying to install pygame via pip")
+        import pip
+        install("pygame")
+        print("[GAME] Pygame has been installed")
+    except:
+        print("[EXCEPTION] Pip not installed on system")
+        print("[GAME] Trying to install pip")
+        get_pip.main()
+        print("[GAME] Pip has been installed")
+        try:
+            print("[GAME] Trying to install pygame")
+            import pip
+            install("pygame")
+            print("[GAME] Pygame has been installed")
+        except:
+            print("[ERROR 1] Pygame could not be installed")
+
 import physics
 import math
 import pygame
@@ -11,6 +42,9 @@ import sys
 
 # INITIALIZATION
 pygame.init()
+
+SOUNDS = False
+
 winwidth = 1080
 winheight = 600
 pygame.display.set_caption('Super Minigolf')
@@ -56,12 +90,13 @@ shoot = False
 start = True
 
 # LOAD MUSIC
-wrong = pygame.mixer.Sound(os.path.join('sounds', 'wrong12.wav'))
-puttSound = pygame.mixer.Sound(os.path.join('sounds', 'putt.wav'))
-inHole = pygame.mixer.Sound(os.path.join('sounds', 'inHole.wav'))
-song = pygame.mixer.music.load(os.path.join('sounds', 'music.mp3'))
-splash = pygame.mixer.Sound(os.path.join('sounds', 'splash.wav'))
-pygame.mixer.music.play(-1)
+if SOUNDS:
+    wrong = pygame.mixer.Sound(os.path.join('sounds', 'wrong12.wav'))
+    puttSound = pygame.mixer.Sound(os.path.join('sounds', 'putt.wav'))
+    inHole = pygame.mixer.Sound(os.path.join('sounds', 'inHole.wav'))
+    song = pygame.mixer.music.load(os.path.join('sounds', 'music.mp3'))
+    splash = pygame.mixer.Sound(os.path.join('sounds', 'splash.wav'))
+    pygame.mixer.music.play(-1)
 
 # POWER UP VARS
 powerUps = 7
@@ -168,7 +203,8 @@ class scoreSheet():
 
 
 def error():
-    wrong.play()
+    if SOUND:
+        wrong.play()
     root = tk.Tk()
     root.attributes("-topmost", True)
     root.withdraw()
@@ -450,12 +486,12 @@ def redrawWindow(ball, line, shoot=False, update=True):
 
     if line != None and not (shoot): # If we are not in the process of shooting show the angle line
         pygame.draw.line(win, (0, 0, 0), ballStationary, line, 2)
-    
+
     # Draw the ball and its outline
     pygame.draw.circle(win, (0, 0, 0), ball, 5)
     pygame.draw.circle(win, ballColor, ball, 4)
 
-    if update:  
+    if update:
         powerBar()
 
 
@@ -502,7 +538,7 @@ def findAngle(pos):
 
 def onGreen():  # Determine if we are on the green
     global hole
-    
+
     for i in objects:
         if i[4] == 'green':
             if ballStationary[1] < i[1] + i[3] and ballStationary[1] > i[1] - 20 and ballStationary[0] > i[0] and ballStationary[0] < i[0] + i[2]:
@@ -574,7 +610,7 @@ while starting:
                             surface = startScreen.drawShop(pos, True)
                             win.blit(surface, (0,0))
                             pygame.display.update()
-                    
+
         if event.type == pygame.QUIT:
             pygame.quit()
             break
@@ -659,7 +695,7 @@ while True:
                 neg = 1
                 powerLock = False
                 loopTime = 0
-                
+
                 while not powerLock:  # If we haven't locked power stay in this loop until we do
                     loopTime += 1
                     if loopTime == 6:
@@ -670,7 +706,7 @@ while True:
                             neg = neg * -1
                     else:
                         redrawWindow(ballStationary, line, False, False)
-                    
+
 
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
@@ -682,7 +718,8 @@ while True:
                                 shoot = True
                             else:
                                 put = True
-                                puttSound.play()
+                                if SOUND:
+                                    puttSound.play()
                             if put:
                                 power = (math.pi - powerAngle) * 5
                                 rollVel = power
@@ -710,7 +747,7 @@ while True:
 
     redrawWindow(ballStationary, line)
     hitting = False
-    
+
     while put and not shoot:  # If we are putting
         # If we aren't in the hole
         if not(overHole(ballStationary[0], ballStationary[1])):
@@ -739,7 +776,8 @@ while True:
                         line = (ballStationary[0] + 30, ballStationary[1])
         else:
             # We have got the ball in the hole
-            inHole.play()
+            if SOUND:
+                inHole.play()
             while True:  # Move ball so it looks like it goes into the hole (increase y value)
                 pygame.time.delay(20)
                 redrawWindow(ballStationary, None, True)
@@ -834,7 +872,8 @@ while True:
                         strokes += 1
 
                         label = myFont.render('Water Hazard, +1 stroke', 1, (255, 255, 255))
-                        splash.play()
+                        if SOUND:
+                            splash.play()
                         win.blit(label, (winwidth / 2 - label.get_width() / 2, winheight / 2 - label.get_height() / 2))
                         pygame.display.update()
                         pygame.time.delay(1500)
@@ -900,7 +939,7 @@ while True:
                             power = 1
                             powerAngle = math.pi
 
-                    
+
                     elif ballCords[1] < i[1] + i[3] and ballCords[1] > i[1] and ballCords[0] > i[0] - 2 and ballCords[0] < i[0] + 10:
                         hitting = False
                         power = physics.findPower(power, angle, time)
@@ -975,7 +1014,7 @@ while True:
                                     break
 
 
-                
+
                     elif ballCords[1] > i[1] + i[3]and ballCords[0] + 2 > i[0] and ballCords[1] < i[1] + i[3] + 10 and ballCords[0] < i[0] + i[2] + 2:
                         power = physics.findPower(power, angle, time)
                         if not(hitting):
@@ -1025,9 +1064,10 @@ while True:
                         mullagain = False
                         superPower = False
                         break
-                    
+
         else:
-            inHole.play()
+            if SOUND:
+                inHole.play()
             var = True
             while var:
                 pygame.time.delay(20)
@@ -1049,7 +1089,7 @@ while True:
                 displayScore(strokes, par)
 
             strokes = 0
-                        
+
     if onGreen():
         if ballStationary[0] > flagx:
             angle = math.pi
