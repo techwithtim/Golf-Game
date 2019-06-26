@@ -6,4 +6,4 @@ RUN apt-get update && apt-get install -y \
         python3-tk \
         python-tk \
     && apt-get clean && rm -rf /var/cache/apt/* && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
-RUN PYTHONUSERBASE=/usr/bin/ pip install --user pygame
+RUN PYTHONUSERBASE=/usr/bin/ pip3 install --user pygame
