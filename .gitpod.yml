@@ -1,0 +1,11 @@
+
+image:
+    file: .gitpod.dockerfile
+ports:
+  - port: 5900
+    onOpen: ignore
+  - port: 6080
+    onOpen: open-preview
+tasks:
+    - command: /usr/bin/python3 -m pip install pygame
+      command: /usr/bin/python3 main.py
